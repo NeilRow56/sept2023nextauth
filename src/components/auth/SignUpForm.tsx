@@ -1,11 +1,13 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
+import { toast } from 'react-hot-toast'
 
 const SignUpForm = () => {
   const router = useRouter()
@@ -14,12 +16,43 @@ const SignUpForm = () => {
     email: '',
     password: '',
   })
+  const [buttonDisabled, setButtonDisabled] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
-  const onSignUp = async () => {}
+
+  const onSignUp = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.post('/api/users/signup', user).then(() => {
+        toast.success('User created')
+      })
+
+      router.push('/sign-in')
+    } catch (error: any) {
+      console.log('Signup failed', error.message)
+
+      toast.error(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (
+      user.email.length > 0 &&
+      user.password.length > 0 &&
+      user.username.length > 0
+    ) {
+      setButtonDisabled(false)
+    } else {
+      setButtonDisabled(true)
+    }
+  }, [user])
 
   return (
     <div className="flex flex-1 flex-col justify-center  rounded-lg bg-gray-400 p-4">
-      <h1 className="pb-2 text-3xl font-bold">Sign Up</h1>
+      <h1 className="pb-2 text-3xl font-bold">
+        {loading ? 'Processing' : 'Sign Up'}
+      </h1>
       <hr />
       <Label className="pb-2 pt-3 text-lg" htmlFor="username">
         Username
@@ -52,7 +85,7 @@ const SignUpForm = () => {
         placeholder="Password"
       />
       <Button className="mt-8" onClick={onSignUp}>
-        Submit
+        {buttonDisabled ? 'Please complete all fields' : 'Sign Up'}
       </Button>
       <Link href="/sign-in">
         <span className="flex items-center pt-2">

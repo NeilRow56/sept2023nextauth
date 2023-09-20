@@ -3,6 +3,7 @@ import '../globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { cn } from '@/lib/utils'
+import ToasterProvider from '@/providers/ToastProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       )}
     >
       <body className="flex h-screen flex-col bg-gray-100 antialiased">
+        <ToasterProvider />
         <Navbar />
         <div className="container mx-auto flex max-w-7xl flex-grow bg-red-50  ">
           {children}
